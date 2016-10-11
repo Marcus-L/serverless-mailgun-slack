@@ -1,0 +1,39 @@
+#define( $body )
+  {
+  #foreach( $token in $input.path('$').split('&') )
+	#set( $keyVal = $token.split('=') )
+	#set( $keyValSize = $keyVal.size() )
+	#if( $keyValSize >= 1 )
+	  #set( $key = $util.urlDecode($keyVal[0]) )
+	  #if( $keyValSize >= 2 )
+		#set( $val = $util.escapeJavaScript($util.urlDecode($keyVal[1])).replaceAll("\\'", "'") )
+	  #else
+		#set( $val = '' )
+	  #end
+	  "$key": "$val"#if($foreach.hasNext),#end
+	#end
+  #end
+  }
+#end
+
+#define( $loop )
+  {
+  #foreach($key in $map.keySet())
+	  "$util.escapeJavaScript($key)":
+		"$util.escapeJavaScript($map.get($key))"
+		#if( $foreach.hasNext ) , #end
+  #end
+  }
+#end
+
+{
+  "stage": "$context.stage",
+
+  "body": $body,
+  
+  #set( $map = $input.params().header )
+  "headers": $loop,
+
+  #set( $map = $stageVariables )
+  "stageVariables": $loop
+}

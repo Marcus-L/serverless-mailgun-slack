@@ -1,0 +1,18 @@
+service: serverless-mailgun-slack 
+
+provider:
+  name: aws
+  runtime: nodejs4.3
+
+functions:
+  slackPost:
+    handler: handler.slackPost
+    memorySize: 128
+    events: 
+      - http:
+          path: post
+          method: post
+          request:
+            template:
+              multipart/form-data: ${file(request_map_multipart.txt)}
+              application/x-www-form-urlencoded: ${file(request_map_urlencoded.txt)}
